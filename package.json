@@ -1,0 +1,25 @@
+{
+  "name": "iot-server",
+  "version": "1.0.0",
+  "description": "server to host personal IOT system",
+  "main": "server.js",
+  "scripts": {
+	"start": "./start.sh",
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ajwells/IOT-server.git"
+  },
+  "author": "Aaron Wells",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ajwells/IOT-server/issues"
+  },
+  "homepage": "https://github.com/ajwells/IOT-server#readme",
+  "dependencies": {
+    "body-parser": "^1.15.1",
+    "express": "^4.13.4",
+    "mongoose": "^4.4.19"
+  }
+}
