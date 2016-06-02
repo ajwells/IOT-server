@@ -4,7 +4,7 @@
   "description": "server to host personal IOT system",
   "main": "server.js",
   "scripts": {
-	"start": "./start.sh",
+    "start": "./start.sh",
     "test": "node test.js"
   },
   "repository": {
@@ -20,6 +20,7 @@
   "dependencies": {
     "body-parser": "^1.15.1",
     "express": "^4.13.4",
-    "mongoose": "^4.4.19"
+    "mongoose": "^4.4.19",
+    "noble": "^1.5.0"
   }
 }
