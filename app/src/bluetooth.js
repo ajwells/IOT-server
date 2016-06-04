@@ -98,12 +98,11 @@ function notifyChar(peripheral, serviceUUID, charUUID) {
 	return new Promise(function(resolve, reject) {
 		peripheral.discoverSomeServicesAndCharacteristics([serviceUUID], [charUUID],
 			function(error, services, characteristics) {
-				console.log(characteristics[0].notify);
-				characteristics[0].notify(function(error) {
+				characteristics[0].notify(true, function(error) {
 					if (error) {
 						reject(error);
 					} 
-					characteristic.on('data', function(data, isNotification) {
+					characteristics[0].on('data', function(data, isNotification) {
 						console.log(data.toString());
 					});
 					console.log('subscribed');
@@ -132,9 +131,9 @@ discover(discoverList)
 					console.log(ok);
 					readChar(peripheral, serviceUUID2, charUUID2).then(function(data) {
 						console.log(data.toString());
-						/*notifyChar(peripheral, serviceUUID2, charUUID2).then(function(ok) {
+						notifyChar(peripheral, serviceUUID2, charUUID2).then(function(ok) {
 							console.log(ok);
-						});*/
+						});
 					});
 				});
 			});
