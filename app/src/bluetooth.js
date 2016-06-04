@@ -54,6 +54,9 @@ function connectAll(devices) {
 		devices.forEach(function(peripheral, index) {
 			peripheral.on('disconnect', function() {
 				console.log(peripheral.advertisement.localName + ' disconnected');
+				connect(peripheral).then(function(peripheral) {
+					console.log('device reconnected');
+				});
 			});
 			promises.push(connect(peripheral));
 		});
@@ -65,7 +68,7 @@ discoverList = ['EC:44:71:02:29:55'];
 	discover(discoverList)
 	.then(connectAll)
 	.then(function(results) {
-		/*results.forEach(function(peripheral) {
+		results.forEach(function(peripheral) {
 			peripheral.discoverSomeServicesAndCharacteristics(
 			['0dbb9a2d39de45908eacbfdef650416f'],
 			['3c66211138f84a8ebdd61e0a5f403277'],
@@ -78,7 +81,7 @@ discoverList = ['EC:44:71:02:29:55'];
 					}
 				});
 			});
-		});*/
+		});
 	});
 
 
