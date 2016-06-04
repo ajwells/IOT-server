@@ -20,11 +20,13 @@ router.use(function(req, res, next) {
 });
 
 router.get('/', function(req, res) {
-	res.json({ message: 'test' });
+	res.json({ message: 'hello' });
 });
 
 // device routes
 // ----------------------------------
+
+// all devices
 router.route('/devices')
 	// new device
 	.post(function(req, res) {
@@ -45,10 +47,10 @@ router.route('/devices')
 		});
 	});
 
-// device and id
+// device by id
 router.route('/devices/:id')
 
-	// get device by id
+	// list device
 	.get(function(req, res) {
 		Device.findById(req.params.id, function(err, device) {
 			if (err) {res.send(err);}
@@ -56,6 +58,7 @@ router.route('/devices/:id')
 		});
 	})
 
+	// update device
 	.put(function(req, res) {
 		Device.findById(req.params.id, function(err, device) {
 			if (err) { res.send(err); }
@@ -69,6 +72,7 @@ router.route('/devices/:id')
 		});
 	})
 
+	//delete device
 	.delete(function(req, res) {
 		Device.remove({
 			_id: req.params.id
@@ -92,4 +96,6 @@ var mongoose = require('mongoose');
 mongoose.connect(process.env.DBURI);
 
 var Device = require('./app/models/device');
+var Service = require('./app/models/service');
+var Characteristic = require('./app/models/characteristic');
 

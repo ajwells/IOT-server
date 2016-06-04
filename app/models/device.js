@@ -2,11 +2,14 @@
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var Service = require('./service');
 
-var DeviceSchema = new Schema({
+var Device = new Schema({
+	id: String,
 	name: String,
-	status: String
+	status: String,
+	services: [{type: Schema.Types.ObjectId, ref: 'Service'}]
 });
 
-module.exports = mongoose.model('Device', DeviceSchema);
+module.exports = mongoose.model('Device', Device);
 
