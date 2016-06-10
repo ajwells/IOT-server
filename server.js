@@ -97,33 +97,15 @@ router.route('/devices/:id')
 router.route('/services')
 	// new device
 	.post(function(req, res) {
-		var service = new Service();
-		service.name = req.body.name;
-		service._id = req.body._id;
-		var characteristics = JSON.parse(req.body.characteristics);
-		console.log(typeof characteristics);
-		service.characteristics = [];
-		characteristics.forEach(function(item, index) {
-			Characteristic.findById(item, function(err, characteristic) {
-				if (err) {res.send(err);}
-				console.log(characteristic._id);
-				service.characteristics.push(characteristic._id);
-			});
-		});
-		service.save(function(err) {
+		DB.newService(req.body.id, req.body.name, JSON.parse(req.body.characteristics), function(err) {
 			if (err) {res.send(err);}
-			Service.find({})
-				.populate('characteristics')
-				.exec(function(error, services) {
-					console.log(JSON.stringify(services, null, '\t'));
-				});
 			res.json({ message: 'service created' });
 		});
 	})
 	
 	// list all services
 	.get(function(req, res) {
-		Service.find(function(err, services) {
+		DB.listServices(function(err, services) {
 			if (err) {res.send(err);}
 			res.json(services);
 		});
@@ -178,7 +160,7 @@ router.route('/characteristics')
 	
 	// list all characteristics 
 	.get(function(req, res) {
-		DB.getCharacteristics(function (err, characteristics) {
+		DB.listCharacteristics(function (err, characteristics) {
 			if (err) {res.send(err);}
 			res.json(characteristics);
 		});
@@ -189,7 +171,7 @@ router.route('/characteristics/:id')
 
 	// list characteristics  
 	.get(function(req, res) {
-		Characteristic.findById(req.params.id, function(err, characteristic) {
+		DB.getCharacteristic(req.params.id, function(err, characteristic) {
 			if (err) {res.send(err);}
 			res.json(characteristic);
 		});
@@ -197,13 +179,9 @@ router.route('/characteristics/:id')
 
 	// update characteristics 
 	.put(function(req, res) {
-		Characteristic.findById(req.params.id, function(err, characteristic) {
+		DB.updateCharacteristic(req.params.id, req.body.name, req.body.data, function(err) {
 			if (err) { res.send(err); }
-			characteristic.name = req.body.name;
-			characteristic.save(function(err) {
-				if (err) { res.send(err); }
-				res.json({ message: 'service updated' });
-			});
+			res.json({ message: 'service updated' });
 		});
 	})
 
