@@ -31,17 +31,17 @@ DB.prototype.newCharacteristic = function(id, name, data, callback) {
 DB.prototype.updateCharacteristic = function(id, name, data, callback) {
 	var query = 'UPDATE characteristics SET ';
 	if (name && data) {
-		query += ('name = ' + name + ', data = ' + data);
+		query += ('name = \'' + name + '\', data = \'' + data + '\'');
 	}
 	else {
 		if (name) {
-			query += ('name = ' + name);
+			query += ('name = \'' + name + '\'');
 		}
 		else if (data) {
-			query += ('data = ' + data);
+			query += ('data = \'' + data + '\'');
 		}
 	}
-	query += (' WHERE id = ' + data + ';');
+	query += (' WHERE id = \'' + id + '\';');
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
 		callback(null);
@@ -56,9 +56,17 @@ DB.prototype.getCharacteristic = function(id, callback) {
 	});
 };
 
+DB.prototype.deleteCharacteristic = function(id, callback) {
+	var query = 'DELETE FROM characteristics WHERE id = \'' + id + '\';';
+	this.db.run(query, function(error) {
+		if (error) {return callback(error);}
+		callback(null);
+	});
+};
+
 DB.prototype.listServices = function(callback) {
 	var query = 'SELECT * FROM services';
-	this.db.all(query, function (error, data) {
+	this.db.all(query, function(error, data) {
 		if (error) {return callback(error);}
 		callback(null, data);
 	});
@@ -90,6 +98,45 @@ DB.prototype.newService = function(id, name, characteristics, callback) {
 	callback(null);
 };
 
+DB.prototype.updateService = function(id, name, characteristics, callback) {
+	if (name) {
+		var query = 'UPDATE services SET ' +
+			'name = \'' + name + '\'' +
+			' WHERE id = \'' + id + '\';');
+		this.db.run(query, function(error) {
+			if (error) {return callback(error);}
+		});
+	}
 
+	characteristics.forEach(function(characteristic, index) {
+		var query = 'INSERT INTO has_characteristic ' +
+					'(service_id, characteristic_id) ' +
+					'VALUES (' +
+						'\'' + id + '\', ' +
+						'\'' + characteristic + '\'' +
+					');';
+		this.db.run(query, function(error) {
+			if (error) {return callback(error);}
+		});
+	}.bind(this));
+
+	callback(null);
+};
+
+DB.prototype.getService = function(id, callback) {
+	var query = 'SELECT * FROM services WHERE id = \'' + id + '\';';
+	this.db.get(query, function (error, data) {
+		if (error) {callback(error);}
+		callback(null, data);
+	});
+};
+
+DB.prototype.deleteService = function(id, callback) {
+	var query = 'DELETE FROM services WHERE id = \'' + id + '\';';
+	this.db.run(query, function(error) {
+		if (error) {return callback(error);}
+		callback(null);
+	});
+};
 
 module.exports = DB;

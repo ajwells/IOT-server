@@ -116,7 +116,7 @@ router.route('/services/:id')
 
 	// list service
 	.get(function(req, res) {
-		Service.findById(req.params.id, function(err, service) {
+		DB.getService(req.params.id, function(err, service) {
 			if (err) {res.send(err);}
 			res.json(service);
 		});
@@ -124,22 +124,15 @@ router.route('/services/:id')
 
 	// update service
 	.put(function(req, res) {
-		Service.findById(req.params.id, function(err, service) {
+		DB.updateService(req.params.id, req.params.name, JSON.parse(req.body,characteristics), function(err) {
 			if (err) { res.send(err); }
-			
-			service.name = req.body.name;
-			service.save(function(err) {
-				if (err) { res.send(err); }
-				res.json({ message: 'service updated' });
-			});
+			res.json({ message: 'service updated' });
 		});
 	})
 
 	//delete service
 	.delete(function(req, res) {
-		Service.remove({
-			_id: req.params.id
-		}, function(err, service) {
+		DB.deleteService(req.params.id, function(err) {
 			if (err) {res.send(err);}
 			res.json({ message: 'deleted service' });
 		});
@@ -187,9 +180,7 @@ router.route('/characteristics/:id')
 
 	//delete characteristics  
 	.delete(function(req, res) {
-		Characteristic.remove({
-			_id: req.params.id
-		}, function(err, characteristic) {
+		DB.deleteCharacteristic(req.body.id, function(err, characteristic) {
 			if (err) {res.send(err);}
 			res.json({ message: 'deleted characteristic' });
 		});

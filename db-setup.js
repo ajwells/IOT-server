@@ -17,8 +17,8 @@ db.run('CREATE TABLE has_service (' +
 			'FOREIGN KEY(service_id) REFERENCES services(id) ON UPDATE CASCADE ON DELETE CASCADE' +
 		');');
 db.run('CREATE TABLE has_characteristic (' +
-			service_id varchar NOT NULL, ' +
-			characteristic_id varchar NOT NULL, ' +
-			FOREIGN KEY(service_id) REFERENCES services(id) ON UPDATE CASCADE ON DELETE CASCADE, ' +
-			FOREIGN KEY(characteristic_id) REFERENCES characteristics(id) ON UPDATE CASCADE ON DELETE CASCADE' +
+			'service_id varchar NOT NULL, ' +
+			'characteristic_id varchar NOT NULL, ' +
+			'FOREIGN KEY(service_id) REFERENCES services(id) ON UPDATE CASCADE ON DELETE CASCADE, ' +
+			'FOREIGN KEY(characteristic_id) REFERENCES characteristics(id) ON UPDATE CASCADE ON DELETE CASCADE' +
 		');');
