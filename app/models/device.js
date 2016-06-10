@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 var Service = require('./service');
 
 var Device = new Schema({
-	id: String,
+	_id: String,
 	name: String,
 	status: String,
 	services: [{type: Schema.Types.ObjectId, ref: 'Service'}]

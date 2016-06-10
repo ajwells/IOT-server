@@ -5,8 +5,8 @@ var Schema = mongoose.Schema;
 var Characteristic = require('./characteristic');
 
 var Service = new Schema({
+	_id: String,
 	name: String,
-	UUID: String,
 	characteristics: [{type: Schema.Types.ObjectId, ref: 'Characteristic'}]
 });
 

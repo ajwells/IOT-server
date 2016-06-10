@@ -4,8 +4,8 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var Characteristic = new Schema({
+	_id: String,
 	name: String,
-	UUID: String,
 	data: String
 });
 
