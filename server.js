@@ -170,11 +170,7 @@ router.route('/services/:id')
 router.route('/characteristics')
 	// new characteristic
 	.post(function(req, res) {
-		var characteristic = new Characteristic();
-		characteristic.name = req.body.name;
-		characteristic.data = req.body.data;
-		characteristic._id = req.body._id;
-		characteristic.save(function(err) {
+		DB.newCharacteristic(req.body.id, req.body.name, req.body.data, function(err) {
 			if (err) {res.send(err);}
 			res.json({ message: 'characteristic created' });
 		});
