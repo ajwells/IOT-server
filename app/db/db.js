@@ -5,6 +5,40 @@ var DB_NAME = 'IOT-DB.db';
 function DB() {
 	this.db = new sqlite3.Database(DB_NAME);
 }
+// Helper Functions
+
+function addServiceChars(id, characteristics, db) {
+	var promises = [];
+	characteristics.forEach(function(characteristic, index) {
+		var query = 'INSERT INTO has_characteristic ' +
+					'(service_id, characteristic_id) ' +
+					'VALUES (' +
+						'\'' + id + '\', ' +
+						'\'' + characteristic + '\'' +
+					');';
+		promises.push(db.run(query, function(error) {
+			if (error) {return callback(error);}
+		}));
+	});
+	return Promise.all(promises);
+};
+
+function addDeviceServices(id, services, db) {
+	var promises = [];
+	services.forEach(function(service, index) {
+		var query = 'INSERT INTO has_service ' +
+					'(device_id, service_id) ' +
+					'VALUES (' +
+						'\'' + id + '\', ' +
+						'\'' + service + '\'' +
+					');';
+		promises.push(db.run(query, function(error) {
+			if (error) {return callback(error);}
+		}));
+	});
+	return Promise.all(promises);
+};
+
 
 // ------------------------Characteristics------------------------
 
@@ -85,21 +119,11 @@ DB.prototype.newService = function(id, name, characteristics, callback) {
 					');';
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
-	});
-
-	characteristics.forEach(function(characteristic, index) {
-		var query = 'INSERT INTO has_characteristic ' +
-					'(service_id, characteristic_id) ' +
-					'VALUES (' +
-						'\'' + id + '\', ' +
-						'\'' + characteristic + '\'' +
-					');';
-		this.db.run(query, function(error) {
-			if (error) {return callback(error);}
-		});
+		addServiceChars(id, characteristics, this.db)
+			.then(function(result) {
+				callback(null);
+			});
 	}.bind(this));
-
-	callback(null);
 };
 
 DB.prototype.updateService = function(id, name, characteristics, callback) {
@@ -109,26 +133,21 @@ DB.prototype.updateService = function(id, name, characteristics, callback) {
 			' WHERE id = \'' + id + '\';';
 		this.db.run(query, function(error) {
 			if (error) {return callback(error);}
-		});
+			addServiceChars(id, characteristics, this.db)
+				.then(function(result) {
+					callback(null);
+				});
+		}.bind(this));
+	} else if (characteristics) {
+		addServiceChars(id, characteristics, this.db)
+			.then(function(result) {
+				callback(null);
+			});
 	}
-
-	characteristics.forEach(function(characteristic, index) {
-		var query = 'INSERT INTO has_characteristic ' +
-					'(service_id, characteristic_id) ' +
-					'VALUES (' +
-						'\'' + id + '\', ' +
-						'\'' + characteristic + '\'' +
-					');';
-		this.db.run(query, function(error) {
-			if (error) {return callback(error);}
-		});
-	}.bind(this));
-
-	callback(null);
 };
 
 DB.prototype.getService = function(id, callback) {
-	var query = 'SELECT * FROM services WHERE id = \'' + id + '\';';
+	var query = 'SELECT * FROM services, has_characteristic WHERE id = \'' + id + '\' and id = service_id;';
 	this.db.get(query, function (error, data) {
 		if (error) {callback(error);}
 		callback(null, data);
@@ -159,61 +178,48 @@ DB.prototype.newDevice = function(id, name, services, callback) {
 					'VALUES (' +
 						'\'' + id + '\', ' +
 						'\'' + name + '\', ' +
-						'\'' + 'false' +
+						'\'' + 'false' + '\'' +
 					');';
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
-	});
-
-	services.forEach(function(service, index) {
-		var query = 'INSERT INTO has_service ' +
-					'(device_id, service_id) ' +
-					'VALUES (' +
-						'\'' + id + '\', ' +
-						'\'' + service + '\'' +
-					');';
-		this.db.run(query, function(error) {
-			if (error) {return callback(error);}
-		});
+		addDeviceServices(id, services, this.db)
+			.then(function(result) {
+				callback(null);
+			});
 	}.bind(this));
-
-	callback(null);
 };
 
 DB.prototype.updateDevice = function(id, name, connected, services, callback) {
-	var query = 'UPDATE devices SET ';
-	if (name && connected) {
-		query += 'name = \'' + name + '\' connected = \'' + connected + '\';';
-	}
-	else {
-		if (name) {
-			query += ('name = \'' + name + '\'');
-		} else if (connected) {
-			query += ('connected = \'' + connected + '\'');
+	if (name || connected) {
+		var query = 'UPDATE devices SET ';
+		if (name && connected) {
+			query += 'name = \'' + name + '\' connected = \'' + connected + '\';';
 		}
-	}
-	query += (' WHERE id = \'' + id + '\';');
-	this.db.run(query, function(error) {
-		if (error) {return callback(error);}
-	});
-
-	services.forEach(function(service, index) {
-		var query = 'INSERT INTO has_service ' +
-					'(device_id, service_id) ' +
-					'VALUES (' +
-						'\'' + id + '\', ' +
-						'\'' + service + '\'' +
-					');';
+		else {
+			if (name) {
+				query += ('name = \'' + name + '\'');
+			} else if (connected) {
+				query += ('connected = \'' + connected + '\'');
+			}
+		}
+		query += (' WHERE id = \'' + id + '\';');
 		this.db.run(query, function(error) {
 			if (error) {return callback(error);}
-		});
-	}.bind(this));
-
-	callback(null);
+			addDeviceServices(id, services, this.db)
+				.then(function(result) {
+					callback(null);
+				});
+		}.bind(this));
+	} else if (services) {
+		addDeviceServices(id, services, this.db)
+			.then(function(result) {
+				callback(null);
+			});
+	}
 };
 
 DB.prototype.getDevice = function(id, callback) {
-	var query = 'SELECT * FROM devices WHERE id = \'' + id + '\';';
+	var query = 'SELECT * FROM devices, has_service WHERE id = \'' + id + '\' and id = device_id;';
 	this.db.get(query, function (error, data) {
 		if (error) {callback(error);}
 		callback(null, data);

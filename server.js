@@ -27,7 +27,7 @@ router.use(function(req, res, next) {
 });
 
 router.get('/', function(req, res) {
-	res.json({ message: 'hello' });
+	res.json({ message: 'wassup' });
 });
 
 // device routes
@@ -39,7 +39,7 @@ router.route('/devices')
 	.post(function(req, res) {
 		DB.newDevice(req.body.id, req.body.name, JSON.parse(req.body.services), function(err) {
 			if (err) {res.send(err);}
-			res.json({ message: 'device created' });
+			else {res.json({ message: 'device created' });}
 		});
 	})
 	
@@ -47,7 +47,7 @@ router.route('/devices')
 	.get(function(req, res) {
 		DB.listDevices(function(err, devices) {
 			if (err) {res.send(err);}
-			res.json(devices);
+			else {res.json(devices);}
 		});
 	});
 
@@ -58,7 +58,7 @@ router.route('/devices/:id')
 	.get(function(req, res) {
 		DB.getDevice(req.params.id, function(err, device) {
 			if (err) {res.send(err);}
-			res.json(device);
+			else {res.json(device);}
 		});
 	})
 
@@ -66,7 +66,7 @@ router.route('/devices/:id')
 	.put(function(req, res) {
 		DB.updateDevice(req.params.id, req.body.name, req.body.connected, function(err) {
 			if (err) { res.send(err); }
-			res.json({ message: 'device updated' });
+			else {res.json({ message: 'device updated' });}
 		});
 	})
 
@@ -74,7 +74,7 @@ router.route('/devices/:id')
 	.delete(function(req, res) {
 		DB.deleteDevice(req.params.id, function(err) {
 			if (err) {res.send(err);}
-			res.json({ message: 'deleted device' });
+			else {res.json({ message: 'deleted device' });}
 		});
 	});
 
@@ -87,7 +87,7 @@ router.route('/services')
 	.post(function(req, res) {
 		DB.newService(req.body.id, req.body.name, JSON.parse(req.body.characteristics), function(err) {
 			if (err) {res.send(err);}
-			res.json({ message: 'service created' });
+			else {res.json({ message: 'service created' });}
 		});
 	})
 	
@@ -95,7 +95,7 @@ router.route('/services')
 	.get(function(req, res) {
 		DB.listServices(function(err, services) {
 			if (err) {res.send(err);}
-			res.json(services);
+			else {res.json(services);}
 		});
 	});
 
@@ -106,7 +106,7 @@ router.route('/services/:id')
 	.get(function(req, res) {
 		DB.getService(req.params.id, function(err, service) {
 			if (err) {res.send(err);}
-			res.json(service);
+			else {res.json(service);}
 		});
 	})
 
@@ -114,7 +114,7 @@ router.route('/services/:id')
 	.put(function(req, res) {
 		DB.updateService(req.params.id, req.params.name, JSON.parse(req.body,characteristics), function(err) {
 			if (err) { res.send(err); }
-			res.json({ message: 'service updated' });
+			else {res.json({ message: 'service updated' });}
 		});
 	})
 
@@ -122,7 +122,7 @@ router.route('/services/:id')
 	.delete(function(req, res) {
 		DB.deleteService(req.params.id, function(err) {
 			if (err) {res.send(err);}
-			res.json({ message: 'deleted service' });
+			else {res.json({ message: 'deleted service' });}
 		});
 	});
 
@@ -135,7 +135,7 @@ router.route('/characteristics')
 	.post(function(req, res) {
 		DB.newCharacteristic(req.body.id, req.body.name, req.body.data, function(err) {
 			if (err) {res.send(err);}
-			res.json({ message: 'characteristic created' });
+			else {res.json({ message: 'characteristic created' });}
 		});
 	})
 	
@@ -143,7 +143,7 @@ router.route('/characteristics')
 	.get(function(req, res) {
 		DB.listCharacteristics(function (err, characteristics) {
 			if (err) {res.send(err);}
-			res.json(characteristics);
+			else {res.json(characteristics);}
 		});
 	});
 
@@ -154,7 +154,7 @@ router.route('/characteristics/:id')
 	.get(function(req, res) {
 		DB.getCharacteristic(req.params.id, function(err, characteristic) {
 			if (err) {res.send(err);}
-			res.json(characteristic);
+			else {res.json(characteristic);}
 		});
 	})
 
@@ -162,7 +162,7 @@ router.route('/characteristics/:id')
 	.put(function(req, res) {
 		DB.updateCharacteristic(req.params.id, req.body.name, req.body.data, function(err) {
 			if (err) { res.send(err); }
-			res.json({ message: 'service updated' });
+			else {res.json({ message: 'service updated' });}
 		});
 	})
 
@@ -170,7 +170,7 @@ router.route('/characteristics/:id')
 	.delete(function(req, res) {
 		DB.deleteCharacteristic(req.body.id, function(err, characteristic) {
 			if (err) {res.send(err);}
-			res.json({ message: 'deleted characteristic' });
+			else {res.json({ message: 'deleted characteristic' });}
 		});
 	});
 
