@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 // server.js
 
-
 var express = require('express');
 var bodyParser = require('body-parser');
 
@@ -38,10 +37,7 @@ router.get('/', function(req, res) {
 router.route('/devices')
 	// new device
 	.post(function(req, res) {
-		var device = new Device();
-		device.name = req.body.name;
-		device.status = req.body.status;
-		device.save(function(err) {
+		DB.newDevice(req.body.id, req.body.name, JSON.parse(req.body.services), function(err) {
 			if (err) {res.send(err);}
 			res.json({ message: 'device created' });
 		});
@@ -49,7 +45,7 @@ router.route('/devices')
 	
 	// list all devices
 	.get(function(req, res) {
-		Device.find(function(err, devices) {
+		DB.listDevices(function(err, devices) {
 			if (err) {res.send(err);}
 			res.json(devices);
 		});
@@ -60,7 +56,7 @@ router.route('/devices/:id')
 
 	// list device
 	.get(function(req, res) {
-		Device.findById(req.params.id, function(err, device) {
+		DB.getDevice(req.params.id, function(err, device) {
 			if (err) {res.send(err);}
 			res.json(device);
 		});
@@ -68,23 +64,15 @@ router.route('/devices/:id')
 
 	// update device
 	.put(function(req, res) {
-		Device.findById(req.params.id, function(err, device) {
+		DB.updateDevice(req.params.id, req.body.name, req.body.connected, function(err) {
 			if (err) { res.send(err); }
-			
-			device.name = req.body.name;
-			device.status = req.body.status;
-			device.save(function(err) {
-				if (err) { res.send(err); }
-				res.json({ message: 'device updated' });
-			});
+			res.json({ message: 'device updated' });
 		});
 	})
 
 	//delete device
 	.delete(function(req, res) {
-		Device.remove({
-			_id: req.params.id
-		}, function(err, device) {
+		DB.deleteDevice(req.params.id, function(err) {
 			if (err) {res.send(err);}
 			res.json({ message: 'deleted device' });
 		});

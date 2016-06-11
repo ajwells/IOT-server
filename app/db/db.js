@@ -6,6 +6,8 @@ function DB() {
 	this.db = new sqlite3.Database(DB_NAME);
 }
 
+// ------------------------Characteristics------------------------
+
 DB.prototype.listCharacteristics = function(callback) {
 	var query = 'SELECT * FROM characteristics';
 	this.db.all(query, function (error, data) {
@@ -64,6 +66,8 @@ DB.prototype.deleteCharacteristic = function(id, callback) {
 	});
 };
 
+// ------------------------Services------------------------
+
 DB.prototype.listServices = function(callback) {
 	var query = 'SELECT * FROM services';
 	this.db.all(query, function(error, data) {
@@ -102,7 +106,7 @@ DB.prototype.updateService = function(id, name, characteristics, callback) {
 	if (name) {
 		var query = 'UPDATE services SET ' +
 			'name = \'' + name + '\'' +
-			' WHERE id = \'' + id + '\';');
+			' WHERE id = \'' + id + '\';';
 		this.db.run(query, function(error) {
 			if (error) {return callback(error);}
 		});
@@ -133,6 +137,91 @@ DB.prototype.getService = function(id, callback) {
 
 DB.prototype.deleteService = function(id, callback) {
 	var query = 'DELETE FROM services WHERE id = \'' + id + '\';';
+	this.db.run(query, function(error) {
+		if (error) {return callback(error);}
+		callback(null);
+	});
+};
+
+// ------------------------Devices------------------------
+
+DB.prototype.listDevices = function(callback) {
+	var query = 'SELECT * FROM devices';
+	this.db.all(query, function(error, data) {
+		if (error) {return callback(error);}
+		callback(null, data);
+	});
+};
+
+DB.prototype.newDevice = function(id, name, services, callback) {
+	var query = 'INSERT INTO devices ' +
+					'(id, name, connected) ' +
+					'VALUES (' +
+						'\'' + id + '\', ' +
+						'\'' + name + '\', ' +
+						'\'' + 'false' +
+					');';
+	this.db.run(query, function(error) {
+		if (error) {return callback(error);}
+	});
+
+	services.forEach(function(service, index) {
+		var query = 'INSERT INTO has_service ' +
+					'(device_id, service_id) ' +
+					'VALUES (' +
+						'\'' + id + '\', ' +
+						'\'' + service + '\'' +
+					');';
+		this.db.run(query, function(error) {
+			if (error) {return callback(error);}
+		});
+	}.bind(this));
+
+	callback(null);
+};
+
+DB.prototype.updateDevice = function(id, name, connected, services, callback) {
+	var query = 'UPDATE devices SET ';
+	if (name && connected) {
+		query += 'name = \'' + name + '\' connected = \'' + connected + '\';';
+	}
+	else {
+		if (name) {
+			query += ('name = \'' + name + '\'');
+		} else if (connected) {
+			query += ('connected = \'' + connected + '\'');
+		}
+	}
+	query += (' WHERE id = \'' + id + '\';');
+	this.db.run(query, function(error) {
+		if (error) {return callback(error);}
+	});
+
+	services.forEach(function(service, index) {
+		var query = 'INSERT INTO has_service ' +
+					'(device_id, service_id) ' +
+					'VALUES (' +
+						'\'' + id + '\', ' +
+						'\'' + service + '\'' +
+					');';
+		this.db.run(query, function(error) {
+			if (error) {return callback(error);}
+		});
+	}.bind(this));
+
+	callback(null);
+};
+
+DB.prototype.getDevice = function(id, callback) {
+	var query = 'SELECT * FROM devices WHERE id = \'' + id + '\';';
+	this.db.get(query, function (error, data) {
+		if (error) {callback(error);}
+		callback(null, data);
+	});
+};
+
+DB.prototype.deleteDevice = function(id, callback) {
+	var query = 'DELETE FROM devices WHERE id = \'' + id + '\';';
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
 		callback(null);
