@@ -1,30 +1,6 @@
 var noble = require('noble');
-
-
-noble.on('stateChange', function(state) {
-	if (state === 'poweredOn') {
-		noble.startScanning();
-	} else {
-		noble.stopScanning();
-	}
-});
-
-function discover(discoverList, timeout = 5000) {
-	return new Promise(function(resolve, reject) {
-		var devices = [];
-		noble.on('discover', function(peripheral) {
-			console.log('Discovered: ' + peripheral.advertisement.localName +
-				' (' + peripheral.address.toUpperCase() + ')');
-			if (discoverList.indexOf(peripheral.address.toUpperCase()) >= 0) {
-				devices.push(peripheral);
-			}
-		});
-		setTimeout(function() {
-			noble.stopScanning();
-			resolve(devices);
-		}, timeout);
-	});
-};
+var db = require('./db');
+var DB = new db();
 
 function discoverAllServices(peripheral) {
 	return new Promise(function(resolve, reject) {
@@ -48,7 +24,34 @@ function connect(peripheral) {
 	});
 };
 
-function connectAll(devices) {
+function BT() {
+	noble.on('stateChange', function(state) {
+		if (state === 'poweredOn') {
+			noble.startScanning();
+		} else {
+			noble.stopScanning();
+		}
+	});
+};
+
+BT.prototype.discover = function(discoverList, timeout = 5000) {
+	return new Promise(function(resolve, reject) {
+		var devices = [];
+		noble.on('discover', function(peripheral) {
+			console.log('Discovered: ' + peripheral.advertisement.localName +
+				' (' + peripheral.address.toUpperCase() + ')');
+			if (discoverList.indexOf(peripheral.address.toUpperCase()) >= 0) {
+				devices.push(peripheral);
+			}
+		});
+		setTimeout(function() {
+			noble.stopScanning();
+			resolve(devices);
+		}, timeout);
+	});
+};
+
+BT.prototype.connectAll = function(devices) {
 	var connectedDevices = [];
 	var promises = [];
 	devices.forEach(function(peripheral, index) {
@@ -63,7 +66,7 @@ function connectAll(devices) {
 	return Promise.all(promises);
 };
 
-function readChar(peripheral, serviceUUID, charUUID) {
+BT.prototype.readChar = function(peripheral, serviceUUID, charUUID) {
 	return new Promise(function(resolve, reject) {
 		peripheral.discoverSomeServicesAndCharacteristics([serviceUUID], [charUUID],
 			function(error, services, characteristics) {
@@ -78,7 +81,7 @@ function readChar(peripheral, serviceUUID, charUUID) {
 	});
 };
 
-function writeChar(peripheral, serviceUUID, charUUID, data, withoutResponse) {
+BT.prototype.writeChar = function(peripheral, serviceUUID, charUUID, data, withoutResponse) {
 	return new Promise(function(resolve, reject) {
 		peripheral.discoverSomeServicesAndCharacteristics([serviceUUID], [charUUID],
 			function(error, services, characteristics) {
@@ -94,7 +97,7 @@ function writeChar(peripheral, serviceUUID, charUUID, data, withoutResponse) {
 	});
 };
 
-function notifyChar(peripheral, serviceUUID, charUUID) {
+BT.prototype.notifyChar = function(peripheral, serviceUUID, charUUID) {
 	return new Promise(function(resolve, reject) {
 		peripheral.discoverSomeServicesAndCharacteristics([serviceUUID], [charUUID],
 			function(error, services, characteristics) {
@@ -112,14 +115,18 @@ function notifyChar(peripheral, serviceUUID, charUUID) {
 	});
 };
 
+module.exports = BT;
 
+/*
 var discoverList = ['EC:44:71:02:29:55'];
 var serviceUUID = '0dbb9a2d39de45908eacbfdef650416f';
 var charUUID = '3c66211138f84a8ebdd61e0a5f403277';
 var connectedList = [];
 var serviceUUID2 = 'a3aa7ef1fc73424a83a85c99a905a4d3';
 var charUUID2 = 'b49b1d222ca7448bb98a1185c5328553';
+*/
 
+/*
 discover(discoverList)
 	.then(connectAll)
 	.then(function(results) {
@@ -139,6 +146,7 @@ discover(discoverList)
 			});
 		});
 	});
+	*/
 
 
 	

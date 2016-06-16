@@ -13,9 +13,19 @@ var PORT = process.env.port || 8080;
 // DB SETUP
 // ----------------------------------
 
-var db = require('./app/db/db');
+var db = require('./app/src/db');
 var DB = new db();
 
+// BLUETOOTH
+// ----------------------------------
+var bt = require('./app/src/bluetooth');
+var BT = new bt();
+var discoverList = ['EC:44:71:02:29:55'];
+BT.discover(discoverList)
+	.then(BT.connectAll)
+	.then(function(results) {
+		console.log('devices connected');
+	});
 
 // ROUTES FOR API
 // ----------------------------------

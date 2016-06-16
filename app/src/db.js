@@ -3,7 +3,7 @@ var sqlite3 = require('sqlite3');
 var DB_NAME = 'IOT-DB.db';
 
 function DB() {
-	this.db = new sqlite3.Database(DB_NAME);
+	this.db = new sqlite3.Database('/home/pi/IOT-server/' + DB_NAME);
 }
 // Helper Functions
 
