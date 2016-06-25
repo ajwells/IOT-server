@@ -18,14 +18,35 @@ var DB = new db();
 
 // BLUETOOTH
 // ----------------------------------
+
 var bt = require('./app/src/bluetooth');
 var BT = new bt();
-var discoverList = ['EC:44:71:02:29:55'];
-BT.discover(discoverList)
-	.then(BT.connectAll)
-	.then(function(results) {
-		console.log('devices connected');
+DB.listDeviceIDs(function(err, discoverList) {
+	if (err) {console.log(err);}
+	discoverList = discoverList.map(function(curVal) {
+		return curVal.id;
 	});
+	BT.discover(discoverList)
+		.then(BT.connectAll)
+		.then(function(results) {
+			DB.getAllDeviceInfo()
+				.then(function(device_info) {
+					results.forEach(function(peripheral, index) {
+						device_info.forEach(function(device, index) {
+							if (device.device_id.toLowerCase() == peripheral.address) {
+								BT.readChar(peripheral, device.service_id, device.characteristic_id)
+									.then(function(data) {
+										console.log(data.toString());
+										DB.updateCharacteristic(device.characteristic_id, null, data.toString(), function(err) {
+											if (err) {console.log(err);}
+										});
+									});
+							}
+						});
+					});
+				}.bind(this));
+		});
+});
 
 // ROUTES FOR API
 // ----------------------------------
@@ -183,6 +204,9 @@ router.route('/characteristics/:id')
 			else {res.json({ message: 'deleted characteristic' });}
 		});
 	});
+
+// bluetooth routes
+// ----------------------------------
 
 // REGISTER ROUTES AND START SERVER
 // ----------------------------------

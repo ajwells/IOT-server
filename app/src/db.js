@@ -47,7 +47,7 @@ DB.prototype.listCharacteristics = function(callback) {
 	this.db.all(query, function (error, data) {
 		if (error) {return callback(error);}
 		callback(null, data);
-	});
+	}.bind(this));
 };
 
 DB.prototype.newCharacteristic = function(id, name, data, callback) {
@@ -61,7 +61,7 @@ DB.prototype.newCharacteristic = function(id, name, data, callback) {
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
 		callback(null);
-	});
+	}.bind(this));
 };
 
 DB.prototype.updateCharacteristic = function(id, name, data, callback) {
@@ -89,7 +89,7 @@ DB.prototype.getCharacteristic = function(id, callback) {
 	this.db.get(query, function (error, data) {
 		if (error) {callback(error);}
 		callback(null, data);
-	});
+	}.bind(this));
 };
 
 DB.prototype.deleteCharacteristic = function(id, callback) {
@@ -97,7 +97,7 @@ DB.prototype.deleteCharacteristic = function(id, callback) {
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
 		callback(null);
-	});
+	}.bind(this));
 };
 
 // ------------------------Services------------------------
@@ -107,7 +107,7 @@ DB.prototype.listServices = function(callback) {
 	this.db.all(query, function(error, data) {
 		if (error) {return callback(error);}
 		callback(null, data);
-	});
+	}.bind(this));
 };
 
 DB.prototype.newService = function(id, name, characteristics, callback) {
@@ -151,7 +151,7 @@ DB.prototype.getService = function(id, callback) {
 	this.db.get(query, function (error, data) {
 		if (error) {callback(error);}
 		callback(null, data);
-	});
+	}.bind(this));
 };
 
 DB.prototype.deleteService = function(id, callback) {
@@ -159,7 +159,7 @@ DB.prototype.deleteService = function(id, callback) {
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
 		callback(null);
-	});
+	}.bind(this));
 };
 
 // ------------------------Devices------------------------
@@ -169,7 +169,7 @@ DB.prototype.listDevices = function(callback) {
 	this.db.all(query, function(error, data) {
 		if (error) {return callback(error);}
 		callback(null, data);
-	});
+	}.bind(this));
 };
 
 DB.prototype.newDevice = function(id, name, services, callback) {
@@ -223,7 +223,7 @@ DB.prototype.getDevice = function(id, callback) {
 	this.db.get(query, function (error, data) {
 		if (error) {callback(error);}
 		callback(null, data);
-	});
+	}.bind(this));
 };
 
 DB.prototype.deleteDevice = function(id, callback) {
@@ -231,7 +231,27 @@ DB.prototype.deleteDevice = function(id, callback) {
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
 		callback(null);
+	}.bind(this));
+};
+
+DB.prototype.listDeviceIDs = function(callback) {
+	var query = 'SELECT id FROM devices;';
+	this.db.all(query, function(error, data) {
+		if (error) {return callback(error);}
+		callback(null, data);
 	});
+};
+
+// ------------------------Other------------------------
+
+DB.prototype.getAllDeviceInfo = function(callback) {
+	return new Promise(function(resolve, reject) {
+		var query = 'SELECT DISTINCT * FROM has_characteristic NATURAL JOIN has_service;';
+		this.db.all(query, function(error, data) {
+			if (error) {return reject(error);}
+			resolve(data);
+		});
+	}.bind(this));
 };
 
 module.exports = DB;

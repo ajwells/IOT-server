@@ -70,13 +70,18 @@ BT.prototype.readChar = function(peripheral, serviceUUID, charUUID) {
 	return new Promise(function(resolve, reject) {
 		peripheral.discoverSomeServicesAndCharacteristics([serviceUUID], [charUUID],
 			function(error, services, characteristics) {
-				characteristics[0].read(function(error, data) {
-					if (error) {
-						reject(error);
-					} else {
-						resolve(data);
-					}
-				});
+				if (characteristics) {
+					characteristics[0].read(function(error, data) {
+						if (error) {
+							console.log(error);
+							reject(error);
+						} else {
+							resolve(data);
+						}
+					});
+				} else {
+					reject('not found');
+				}
 		});
 	});
 };
