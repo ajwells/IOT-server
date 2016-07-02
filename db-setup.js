@@ -6,9 +6,9 @@ var DB_NAME = 'IOT-DB.db';
 
 var db = new sqlite3.Database(DB_NAME);
 
-db.run('CREATE TABLE devices (id varchar NOT NULL PRIMARY KEY, name varchar NOT NULL, connected boolean NOT NULL);');
-db.run('CREATE TABLE services (id varchar NOT NULL PRIMARY KEY, name varchar NOT NULL);');
-db.run('CREATE TABLE characteristics (id varchar NOT NULL PRIMARY KEY, name varchar NOT NULL, data varchar);');
+db.run('CREATE TABLE devices (device_id varchar NOT NULL PRIMARY KEY, device_name varchar NOT NULL, connected boolean NOT NULL);');
+db.run('CREATE TABLE services (service_id varchar NOT NULL PRIMARY KEY, service_name varchar NOT NULL);');
+db.run('CREATE TABLE characteristics (characteristic_id varchar NOT NULL PRIMARY KEY, characteristic_name varchar NOT NULL, data varchar);');
 
 db.run('CREATE TABLE has_service (' +
 			'device_id varchar NOT NULL, ' +

@@ -52,7 +52,7 @@ DB.prototype.listCharacteristics = function(callback) {
 
 DB.prototype.newCharacteristic = function(id, name, data, callback) {
 	var query = 'INSERT INTO characteristics ' +
-					'(id, name, data) ' +
+					'(characteristic_id, characteristic_name, data) ' +
 					'VALUES (' +
 						'\'' + id + '\', ' +
 						'\'' + name + '\', ' +
@@ -67,17 +67,17 @@ DB.prototype.newCharacteristic = function(id, name, data, callback) {
 DB.prototype.updateCharacteristic = function(id, name, data, callback) {
 	var query = 'UPDATE characteristics SET ';
 	if (name && data) {
-		query += ('name = \'' + name + '\', data = \'' + data + '\'');
+		query += ('characteristic_name = \'' + name + '\', data = \'' + data + '\'');
 	}
 	else {
 		if (name) {
-			query += ('name = \'' + name + '\'');
+			query += ('characteristic_name = \'' + name + '\'');
 		}
 		else if (data) {
 			query += ('data = \'' + data + '\'');
 		}
 	}
-	query += (' WHERE id = \'' + id + '\';');
+	query += (' WHERE characteristic_id = \'' + id + '\';');
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
 		callback(null);
@@ -85,7 +85,7 @@ DB.prototype.updateCharacteristic = function(id, name, data, callback) {
 };
 
 DB.prototype.getCharacteristic = function(id, callback) {
-	var query = 'SELECT * FROM characteristics WHERE id = \'' + id + '\';';
+	var query = 'SELECT * FROM characteristics WHERE characteristic_id = \'' + id + '\';';
 	this.db.get(query, function (error, data) {
 		if (error) {callback(error);}
 		callback(null, data);
@@ -93,7 +93,7 @@ DB.prototype.getCharacteristic = function(id, callback) {
 };
 
 DB.prototype.deleteCharacteristic = function(id, callback) {
-	var query = 'DELETE FROM characteristics WHERE id = \'' + id + '\';';
+	var query = 'DELETE FROM characteristics WHERE characteristic_id = \'' + id + '\';';
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
 		callback(null);
@@ -112,7 +112,7 @@ DB.prototype.listServices = function(callback) {
 
 DB.prototype.newService = function(id, name, characteristics, callback) {
 	var query = 'INSERT INTO services ' +
-					'(id, name) ' +
+					'(service_id, service_name) ' +
 					'VALUES (' +
 						'\'' + id + '\', ' +
 						'\'' + name + '\'' +
@@ -129,8 +129,8 @@ DB.prototype.newService = function(id, name, characteristics, callback) {
 DB.prototype.updateService = function(id, name, characteristics, callback) {
 	if (name) {
 		var query = 'UPDATE services SET ' +
-			'name = \'' + name + '\'' +
-			' WHERE id = \'' + id + '\';';
+			'service_name = \'' + name + '\'' +
+			' WHERE service_id = \'' + id + '\';';
 		this.db.run(query, function(error) {
 			if (error) {return callback(error);}
 			addServiceChars(id, characteristics, this.db)
@@ -147,7 +147,7 @@ DB.prototype.updateService = function(id, name, characteristics, callback) {
 };
 
 DB.prototype.getService = function(id, callback) {
-	var query = 'SELECT * FROM services, has_characteristic WHERE id = \'' + id + '\' and id = service_id;';
+	var query = 'SELECT * FROM services NATURAL JOIN has_characteristic WHERE service_id = \'' + id + '\';';
 	this.db.get(query, function (error, data) {
 		if (error) {callback(error);}
 		callback(null, data);
@@ -155,7 +155,7 @@ DB.prototype.getService = function(id, callback) {
 };
 
 DB.prototype.deleteService = function(id, callback) {
-	var query = 'DELETE FROM services WHERE id = \'' + id + '\';';
+	var query = 'DELETE FROM services WHERE service_id = \'' + id + '\';';
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
 		callback(null);
@@ -174,7 +174,7 @@ DB.prototype.listDevices = function(callback) {
 
 DB.prototype.newDevice = function(id, name, services, callback) {
 	var query = 'INSERT INTO devices ' +
-					'(id, name, connected) ' +
+					'(device_id, device_name, connected) ' +
 					'VALUES (' +
 						'\'' + id + '\', ' +
 						'\'' + name + '\', ' +
@@ -193,16 +193,16 @@ DB.prototype.updateDevice = function(id, name, connected, services, callback) {
 	if (name || connected) {
 		var query = 'UPDATE devices SET ';
 		if (name && connected) {
-			query += 'name = \'' + name + '\' connected = \'' + connected + '\';';
+			query += 'device_name = \'' + name + '\' connected = \'' + connected + '\';';
 		}
 		else {
 			if (name) {
-				query += ('name = \'' + name + '\'');
+				query += ('device_name = \'' + name + '\'');
 			} else if (connected) {
 				query += ('connected = \'' + connected + '\'');
 			}
 		}
-		query += (' WHERE id = \'' + id + '\';');
+		query += (' WHERE device_id = \'' + id + '\';');
 		this.db.run(query, function(error) {
 			if (error) {return callback(error);}
 			addDeviceServices(id, services, this.db)
@@ -219,7 +219,7 @@ DB.prototype.updateDevice = function(id, name, connected, services, callback) {
 };
 
 DB.prototype.getDevice = function(id, callback) {
-	var query = 'SELECT * FROM devices, has_service WHERE id = \'' + id + '\' and id = device_id;';
+	var query = 'SELECT * FROM devices NATURAL JOIN has_service WHERE device_id = \'' + id + '\';';
 	this.db.get(query, function (error, data) {
 		if (error) {callback(error);}
 		callback(null, data);
@@ -227,7 +227,7 @@ DB.prototype.getDevice = function(id, callback) {
 };
 
 DB.prototype.deleteDevice = function(id, callback) {
-	var query = 'DELETE FROM devices WHERE id = \'' + id + '\';';
+	var query = 'DELETE FROM devices WHERE device_id = \'' + id + '\';';
 	this.db.run(query, function(error) {
 		if (error) {return callback(error);}
 		callback(null);
@@ -235,7 +235,7 @@ DB.prototype.deleteDevice = function(id, callback) {
 };
 
 DB.prototype.listDeviceIDs = function(callback) {
-	var query = 'SELECT id FROM devices;';
+	var query = 'SELECT device_id FROM devices;';
 	this.db.all(query, function(error, data) {
 		if (error) {return callback(error);}
 		callback(null, data);
@@ -244,10 +244,21 @@ DB.prototype.listDeviceIDs = function(callback) {
 
 // ------------------------Other------------------------
 
-DB.prototype.getAllDeviceInfo = function(callback) {
+DB.prototype.getAllDeviceInfo = function() {
 	return new Promise(function(resolve, reject) {
 		var query = 'SELECT DISTINCT * FROM has_characteristic NATURAL JOIN has_service;';
 		this.db.all(query, function(error, data) {
+			if (error) {return reject(error);}
+			resolve(data);
+		});
+	}.bind(this));
+};
+
+DB.prototype.getAll = function(device_name, service_name) {
+	return new Promise(function(resolve, reject) {
+		var query = 'SELECT DISTINCT * FROM devices NATURAL JOIN services NATURAL JOIN characteristics NATURAL JOIN has_characteristic NATURAL JOIN has_service ' + 
+					'WHERE device_name = \'' + device_name + '\' AND service_name = \'' + service_name + '\';';
+		this.db.get(query, function(error, data) {
 			if (error) {return reject(error);}
 			resolve(data);
 		});

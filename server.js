@@ -21,14 +21,16 @@ var DB = new db();
 
 var bt = require('./app/src/bluetooth');
 var BT = new bt();
+var devices = [];
 DB.listDeviceIDs(function(err, discoverList) {
 	if (err) {console.log(err);}
 	discoverList = discoverList.map(function(curVal) {
-		return curVal.id;
+		return curVal.device_id;
 	});
 	BT.discover(discoverList)
 		.then(BT.connectAll)
 		.then(function(results) {
+			devices = results;
 			DB.getAllDeviceInfo()
 				.then(function(device_info) {
 					results.forEach(function(peripheral, index) {
@@ -207,6 +209,58 @@ router.route('/characteristics/:id')
 
 // bluetooth routes
 // ----------------------------------
+router.route('/bluetooth/:device_name/:service_name')
+
+	.get(function(req, res) {
+		DB.getAll(req.params.device_name, req.params.service_name)
+			.then(function(results) {
+				if (results) {
+					devices.forEach(function(peripheral, index) {
+						if (peripheral.address == results.device_id.toLowerCase()) {
+							BT.readChar(peripheral, results.service_id, results.characteristic_id)
+								.then(function(result) {
+									return res.send('{ "data": "' + result.toString() + '" }');
+								});
+						} else {
+							return res.json({message: 'no device'});
+						}
+					}.bind(this));
+				} else {
+					return res.json({message: 'no device'});
+				}
+			})
+			.catch(function(error) {
+				return res.send(error)
+			});
+	});
+
+router.route('/bluetooth/:device_name/:service_name/:data')
+
+	.post(function(req, res) {
+		DB.getAll(req.params.device_name, req.params.service_name)
+			.then(function(results) {
+				if (results) {
+					devices.forEach(function(peripheral, index) {
+						if (peripheral.address == results.device_id.toLowerCase()) {
+							BT.writeChar(peripheral, results.service_id, results.characteristic_id, req.params.data, false)
+								.then(function(result) {
+									return res.send('{ "message": "' + result.toString() + '" }');
+								});
+						} else {
+							return res.json({message: 'no device'});
+						}
+					}.bind(this));
+				} else {
+					return res.json({message: 'no device'});
+				}
+			})
+			.catch(function(error) {
+				return res.send(error)
+			});
+	});
+
+		
+
 
 // REGISTER ROUTES AND START SERVER
 // ----------------------------------
